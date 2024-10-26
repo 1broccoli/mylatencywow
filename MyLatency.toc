@@ -1,0 +1,8 @@
+## Interface: 11400
+## Title: Addon Memory Usage
+## Notes: Helps reduce Lag & Improves Preformance
+## Author: Thatdruid
+## Website https://addons.wago.io/user/Broccoli
+## Website https://www.curseforge.com/members/pegga/projects
+## Website https://github.com/1broccoli?tab=repositories
+MyLatency.lua
