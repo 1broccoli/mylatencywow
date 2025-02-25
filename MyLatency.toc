@@ -2,7 +2,7 @@
 ## Title: My|cff1eff00Latency|r
 ## Notes: Show |cff1eff00Latency|r in ms for server and local
 ## Author: |cffe6cc80Pegga|r 
-## Version: 2.0
+## Version: 2.1.3.3.7
 ## SavedVariables: MyLatencyDB
 ## Website https://github.com/1broc2coli?tab=repositories
 

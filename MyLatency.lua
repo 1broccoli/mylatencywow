@@ -101,9 +101,14 @@ local closeButton = CreateFrame("Button", nil, settingsFrame)
 closeButton:SetSize(24, 24)
 closeButton:SetPoint("TOPRIGHT", settingsFrame, "TOPRIGHT", -5, -5)
 closeButton:SetNormalTexture("Interface\\AddOns\\MyLatency\\close.png")
-closeButton:SetHighlightTexture("Interface\\AddOns\\MyLatency\\close.png")
 closeButton:SetScript("OnClick", function()
     settingsFrame:Hide()
+end)
+closeButton:SetScript("OnEnter", function(self)
+    self:GetNormalTexture():SetVertexColor(1, 0, 0) -- Red color on highlight
+end)
+closeButton:SetScript("OnLeave", function(self)
+    self:GetNormalTexture():SetVertexColor(1, 1, 1) -- Reset color
 end)
 
 -- Function to create a slider
