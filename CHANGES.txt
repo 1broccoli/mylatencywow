@@ -1,0 +1,2 @@
+updated server MS value text to change color
+boarder changes color based on highest latency value number now

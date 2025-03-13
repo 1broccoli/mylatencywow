@@ -170,7 +170,9 @@ local function CreateCheckbox(parent, label, yOffset, tooltip, onClick)
 end
 
 -- Function to update the border color based on latency
-local function UpdateBorderColor(latency)
+local function UpdateBorderColor(homeLatency, serverLatency)
+    local latency = math.max(homeLatency, serverLatency) -- Use the higher of the two latencies
+
     if checkbox1 and not checkbox1:GetChecked() then
         infoFrame:SetBackdropBorderColor(0, 0, 0, 0) -- Clear border
         return
@@ -300,20 +302,32 @@ local function UpdateStats()
     serverLatencyValue:SetText(worldMS .. " |cff808080ms|r")
 
     -- Set local latency color for Home Latency
-    local latencyColor
+    local homeLatencyColor
     if homeMS < 70 then
-        latencyColor = {0, 1, 0} -- Green
+        homeLatencyColor = {0, 1, 0} -- Green
     elseif homeMS < 130 then
-        latencyColor = {1, 1, 0} -- Yellow
+        homeLatencyColor = {1, 1, 0} -- Yellow
     else
-        latencyColor = {1, 0, 0} -- Red
+        homeLatencyColor = {1, 0, 0} -- Red
     end
 
-    localLatencyValue:SetTextColor(unpack(latencyColor))
+    localLatencyValue:SetTextColor(unpack(homeLatencyColor))
 
-    -- Update the border color based on local latency
+    -- Set server latency color for Server Latency
+    local serverLatencyColor
+    if worldMS < 70 then
+        serverLatencyColor = {0, 1, 0} -- Green
+    elseif worldMS < 130 then
+        serverLatencyColor = {1, 1, 0} -- Yellow
+    else
+        serverLatencyColor = {1, 0, 0} -- Red
+    end
+
+    serverLatencyValue:SetTextColor(unpack(serverLatencyColor))
+
+    -- Update the border color based on the higher of home and server latency
     if checkbox1 and checkbox1:GetChecked() then
-        UpdateBorderColor(homeMS)
+        UpdateBorderColor(homeMS, worldMS)
     else
         infoFrame:SetBackdropBorderColor(0, 0, 0, 0) -- Clear border
     end
