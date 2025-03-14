@@ -171,7 +171,7 @@ end
 
 -- Function to update the border color based on latency
 local function UpdateBorderColor(homeLatency, serverLatency)
-    local latency = math.max(homeLatency, serverLatency) -- Use the higher of the two latencies
+    local latency = math.max(homeLatency or 0, serverLatency or 0) -- Use the higher of the two latencies, default to 0 if nil
 
     if checkbox1 and not checkbox1:GetChecked() then
         infoFrame:SetBackdropBorderColor(0, 0, 0, 0) -- Clear border
@@ -294,6 +294,10 @@ end)
 local function UpdateStats()
     -- Get Local and Server Latency
     local homeMS, worldMS = select(3, GetNetStats())
+
+    -- Ensure valid values
+    homeMS = homeMS or 0
+    worldMS = worldMS or 0
 
     -- Update local latency text value
     localLatencyValue:SetText(homeMS .. " |cff808080ms|r")
