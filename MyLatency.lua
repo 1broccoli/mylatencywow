@@ -9,7 +9,6 @@ MyLatencyDB = {
     updateLayout = false
 }
 
--- Function to initialize settings
 local function InitializeSettings()
     if not MyLatencyDB then
         MyLatencyDB = {}
@@ -18,8 +17,13 @@ local function InitializeSettings()
     MyLatencyDB.checkboxes = MyLatencyDB.checkboxes or {true, true, true, false, false}
     MyLatencyDB.position = MyLatencyDB.position or {point = "CENTER", relativeTo = nil, relativePoint = "CENTER", xOfs = 0, yOfs = 0}
     MyLatencyDB.frameSize = MyLatencyDB.frameSize or {width = 250, height = 100}
-    MyLatencyDB.updateLayout = MyLatencyDB.updateLayout or false
+    
+    -- Ensure updateLayout is loaded properly
+    if MyLatencyDB.updateLayout == nil then
+        MyLatencyDB.updateLayout = false -- Default to false if not set
+    end
 end
+
 
 -- Create a frame for displaying stats
 local infoFrame = CreateFrame("Frame", "LatencyFrame", UIParent, "BackdropTemplate")
@@ -69,7 +73,7 @@ serverLatencyValue:SetTextColor(0, 1, 0) -- Initial color green
 
 -- Create the settings frame
 local settingsFrame = CreateFrame("Frame", "SettingsFrame", UIParent, "BackdropTemplate")
-settingsFrame:SetSize(200, 250)
+settingsFrame:SetSize(200, 260)
 settingsFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0) -- Centered initially
 settingsFrame:SetBackdrop({
     bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -169,6 +173,8 @@ local function CreateCheckbox(parent, label, yOffset, tooltip, onClick)
     return checkbox
 end
 
+local checkbox1, checkbox2, checkbox3
+
 -- Function to update the border color based on latency
 local function UpdateBorderColor(homeLatency, serverLatency)
     local latency = math.max(homeLatency or 0, serverLatency or 0) -- Use the higher of the two latencies, default to 0 if nil
@@ -187,51 +193,145 @@ local function UpdateBorderColor(homeLatency, serverLatency)
     end
 end
 
--- Function to update the frame size based on content
 local function UpdateFrameSize()
-    local height = 20 -- Base height for padding
-    local width = 20 -- Base width for padding
+    local width, height
 
-    if localLatencyText:IsShown() then
-        height = height + localLatencyText:GetStringHeight() + 10 -- Add height of local latency text and padding
-        width = math.max(width, localLatencyText:GetStringWidth() + localLatencyValue:GetStringWidth() + 20) -- Adjust width to fit local latency text and value
+    if MyLatencyDB.updateLayout then
+        -- Horizontal layout
+        width = 210
+        height = 35
+        localLatencyText:ClearAllPoints()
+        localLatencyText:SetPoint("LEFT", infoFrame, "LEFT", 10, 0)
+        localLatencyValue:ClearAllPoints()
+        localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
+        serverLatencyText:ClearAllPoints()
+        serverLatencyText:SetPoint("LEFT", localLatencyValue, "RIGHT", 20, 0)
+        serverLatencyValue:ClearAllPoints()
+        serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+        
+        -- Adjust width if one of the latencies is hidden
+        if checkbox2 and not checkbox2:GetChecked() then
+            width = width - 100
+        end
+        if checkbox3 and not checkbox3:GetChecked() then
+            width = width - 95
+        elseif checkbox3 and checkbox3:GetChecked() and checkbox2 and not checkbox2:GetChecked() then
+            serverLatencyText:ClearAllPoints()
+            serverLatencyText:SetPoint("LEFT", infoFrame, "LEFT", 10, 0)
+            serverLatencyValue:ClearAllPoints()
+            serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+        end
+    else
+        -- Vertical layout
+        width = 120
+        height = 55
+        localLatencyText:ClearAllPoints()
+        localLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, -10)
+        localLatencyValue:ClearAllPoints()
+        localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
+        serverLatencyText:ClearAllPoints()
+        serverLatencyText:SetPoint("TOPLEFT", localLatencyText, "BOTTOMLEFT", 0, -10)
+        serverLatencyValue:ClearAllPoints()
+        serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+        
+        -- Adjust height if one of the latencies is hidden
+        if checkbox2 and not checkbox2:GetChecked() then
+            height = height - 20
+        end
+        if checkbox3 and not checkbox3:GetChecked() then
+            height = height - 20
+        elseif checkbox3 and checkbox3:GetChecked() and checkbox2 and not checkbox2:GetChecked() then
+            serverLatencyText:ClearAllPoints()
+            serverLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, -10)
+            serverLatencyValue:ClearAllPoints()
+            serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+        end
     end
 
-    if serverLatencyText:IsShown() then
-        height = height + serverLatencyText:GetStringHeight() + 10 -- Add height of server latency text and padding
-        width = math.max(width, serverLatencyText:GetStringWidth() + serverLatencyValue:GetStringWidth() + 20) -- Adjust width to fit server latency text and value
-    end
-
-    infoFrame:SetSize(width, height) -- Adjust frame size to fit content
-    -- Save frame size
-    MyLatencyDB.frameSize = {width = infoFrame:GetWidth(), height = infoFrame:GetHeight()}
+    -- Set new size
+    infoFrame:SetSize(width, height)
+    MyLatencyDB.frameSize = {width = width, height = height}
 end
 
 -- Function to update the layout based on checkbox states
 local function UpdateLayout()
-    local yOffset = -10 -- Initial offset for the first text element
-
-    if checkbox2 and checkbox2:GetChecked() then
-        localLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, yOffset)
+    if MyLatencyDB.updateLayout then
+        -- Horizontal layout
+        localLatencyText:ClearAllPoints() 
+        localLatencyText:SetPoint("LEFT", infoFrame, "LEFT", 10, 0) 
+        localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0) 
+        serverLatencyText:SetPoint("LEFT", localLatencyValue, "RIGHT", 20, 0) 
+        serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0) 
+    else
+        -- Vertical layout
+        localLatencyText:ClearAllPoints()
+        localLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, -10)
         localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
-        yOffset = yOffset - localLatencyText:GetStringHeight() - 10 -- Update offset for the next element
-    end
-
-    if checkbox3 and checkbox3:GetChecked() then
-        if checkbox2 and checkbox2:GetChecked() then
-            serverLatencyText:SetPoint("TOPLEFT", localLatencyText, "BOTTOMLEFT", 0, -10)
-        else
-            serverLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, yOffset)
-        end
+        serverLatencyText:SetPoint("TOPLEFT", localLatencyText, "BOTTOMLEFT", 0, -10)
         serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+        end
+
+        UpdateFrameSize()
     end
 
-    UpdateFrameSize()
+-- Function to apply settings
+local function ApplySettings()
+    infoFrame:SetScale(MyLatencyDB.sliders[1] / 50)  -- Scale from 0.5 to 2
+
+    -- Update layout based on the checkbox state
+    UpdateLayout()
+
+    -- Update backdrop settings
+    infoFrame:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileSize = 16,
+        edgeSize = 16,
+        insets = { left = 4, right = 4, top = 4, bottom = 4 },
+    })
+    infoFrame:SetBackdropColor(0, 0, 0, MyLatencyDB.sliders[2] / 100)
+    infoFrame:SetBackdropBorderColor(1, 1, 1, MyLatencyDB.sliders[2] / 100)
+end
+
+-- Create a button for toggling layout
+local layoutButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
+layoutButton:SetSize(110, 24)
+layoutButton:SetPoint("BOTTOM", settingsFrame, "BOTTOM", 0, 10)
+layoutButton:SetText("Switch Layout")
+layoutButton:SetScript("OnClick", function()
+--- print("Current Layout: " .. (MyLatencyDB.updateLayout and "Horizontal" or "Vertical"))
+    MyLatencyDB.updateLayout = not MyLatencyDB.updateLayout
+    ApplySettings()
+        
+end)
+
+
+-- Apply layout changes initially
+InitializeSettings()
+UpdateLayout()        
+
+-- Function to apply settings
+local function ApplySettings()
+    infoFrame:SetScale(MyLatencyDB.sliders[1] / 50)  -- Scale from 0.5 to 2
+
+    -- Update layout based on the checkbox state
+    UpdateLayout()
+
+    -- Update backdrop settings
+    infoFrame:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileSize = 16,
+        edgeSize = 16,
+        insets = { left = 4, right = 4, top = 4, bottom = 4 },
+    })
+    infoFrame:SetBackdropColor(0, 0, 0, MyLatencyDB.sliders[2] / 100)
+    infoFrame:SetBackdropBorderColor(1, 1, 1, MyLatencyDB.sliders[2] / 100)
 end
 
 -- Create checkboxes
-local checkbox1, checkbox2, checkbox3
-
 checkbox1 = CreateCheckbox(settingsFrame, "Show Border Color", -160, "Toggle the border color based on latency", function(checked)
     local homeMS = select(3, GetNetStats()) -- Get current home latency
     if checked then
@@ -245,13 +345,7 @@ checkbox1:SetID(1)
 checkbox2 = CreateCheckbox(settingsFrame, "Show Home Latency", -180, "Toggle the display of home latency", function(checked)
     localLatencyText:SetShown(checked)
     localLatencyValue:SetShown(checked)
-    if not checked then
-        serverLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, -10)
-        serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
-    else
-        serverLatencyText:SetPoint("TOPLEFT", 10, -30)
-        serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
-    end
+    
     UpdateLayout()
 end)
 checkbox2:SetID(2)
@@ -268,7 +362,7 @@ checkbox3.Text:SetTextColor(0.5, 0.5, 0.5) -- Gray
 local slider1 = CreateSlider(settingsFrame, "Scale", 25, 100, 50, -40, function(value)
     infoFrame:SetScale(value / 50) -- Scale from 0.5 to 2
 end)
-local slider2 = CreateSlider(settingsFrame, "Alpha", 0, 100, 80, -80, function(value)
+local slider2 = CreateSlider(settingsFrame, "Background Alpha", 0, 100, 80, -80, function(value)
     local alpha = value / 100
     infoFrame:SetBackdropColor(0, 0, 0, alpha)
     infoFrame:SetBackdropBorderColor(1, 1, 1, alpha)
@@ -289,6 +383,9 @@ local slider3 = CreateSlider(settingsFrame, "Text Alpha", 0, 100, 100, -120, fun
     serverLatencyText:SetAlpha(alpha)
     serverLatencyValue:SetAlpha(alpha)
 end)
+
+-- Call ApplySettings to apply the initial settings
+ApplySettings()
 
 -- Update function
 local function UpdateStats()
@@ -337,6 +434,65 @@ local function UpdateStats()
     end
 
     UpdateFrameSize() -- Update frame size based on new content
+end
+
+-- Adjust visibility and position of elements
+local function AdjustElementsVisibility()
+    local yOffset = -10
+    if AMU_Settings.showHomeLatency then
+        latencyHomeLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, yOffset)
+        latencyHomeLabel:Show()
+        latencyHomeValue:SetPoint("LEFT", latencyHomeLabel, "RIGHT", 5, 0)
+        latencyHomeValue:Show()
+        yOffset = yOffset - 20
+    else
+        latencyHomeLabel:Hide()
+        latencyHomeValue:Hide()
+    end
+
+    if AMU_Settings.showWorldLatency then
+        latencyWorldLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, yOffset)
+        latencyWorldLabel:Show()
+        latencyWorldValue:SetPoint("LEFT", latencyWorldLabel, "RIGHT", 5, 0)
+        latencyWorldValue:Show()
+        yOffset = yOffset - 20
+    else
+        latencyWorldLabel:Hide()
+        latencyWorldValue:Hide()
+    end
+
+    if AMU_Settings.showMemoryUsage then
+        memoryUsageLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, yOffset)
+        memoryUsageLabel:Show()
+        memoryUsageValue:SetPoint("LEFT", memoryUsageLabel, "RIGHT", 5, 0)
+        memoryUsageValue:Show()
+        yOffset = yOffset - 20
+    else
+        memoryUsageLabel:Hide()
+        memoryUsageValue:Hide()
+    end
+
+    if AMU_Settings.showFPS then
+        fpsLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, yOffset)
+        fpsLabel:Show()
+        fpsValue:SetPoint("LEFT", fpsLabel, "RIGHT", 5, 0)
+        fpsValue:Show()
+        yOffset = yOffset - 20
+    else
+        fpsLabel:Hide()
+        fpsValue:Hide()
+    end
+
+    -- Adjust frame height based on visible elements
+    local height = -yOffset + 10  -- Base height plus padding
+    frame:SetHeight(height)
+    
+    -- Hide frame if all checkboxes are unchecked
+    if not (AMU_Settings.showFPS or AMU_Settings.showHomeLatency or AMU_Settings.showWorldLatency or AMU_Settings.showMemoryUsage) then
+        frame:Hide()
+    else
+        frame:Show()
+    end
 end
 
 -- Set script for updating every second
@@ -394,7 +550,6 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
             checkbox1:GetScript("OnClick")(checkbox1)
             checkbox2:GetScript("OnClick")(checkbox2)
             checkbox3:GetScript("OnClick")(checkbox3)
-            UpdateLayout()
             -- Apply text alpha
             local alpha = MyLatencyDB.sliders[3] / 100
             localLatencyText:SetAlpha(alpha)
@@ -412,6 +567,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
         MyLatencyDB.checkboxes[1] = checkbox1:GetChecked()
         MyLatencyDB.checkboxes[2] = checkbox2:GetChecked()
         MyLatencyDB.checkboxes[3] = checkbox3:GetChecked()
+        MyLatencyDB.updateLayout = not not MyLatencyDB.updateLayout -- Save button state
 
         -- Save frame position
         local point, relativeTo, relativePoint, xOfs, yOfs = infoFrame:GetPoint()

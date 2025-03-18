@@ -1,5 +1,2 @@
-fixed the error message max function is receiving a nil value instead of a number.
-    
-    updated server MS value text to change color
-    boarder changes color based on highest latency value number now
-
+New layout desing - switch between Horizontal or verical view!
+Fixed Frame width and height if home latency or server latency is unchecked! No more gaps!
