@@ -198,14 +198,14 @@ local function UpdateFrameSize()
 
     if MyLatencyDB.updateLayout then
         -- Horizontal layout
-        width = 210
+        width = 220
         height = 35
         localLatencyText:ClearAllPoints()
         localLatencyText:SetPoint("LEFT", infoFrame, "LEFT", 10, 0)
         localLatencyValue:ClearAllPoints()
         localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
         serverLatencyText:ClearAllPoints()
-        serverLatencyText:SetPoint("LEFT", localLatencyValue, "RIGHT", 20, 0)
+        serverLatencyText:SetPoint("LEFT", localLatencyValue, "RIGHT", 15, 0)
         serverLatencyValue:ClearAllPoints()
         serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
         
