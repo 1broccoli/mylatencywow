@@ -1,4 +1,4 @@
--- Addon namespace
+-- Addon Name: MyLatency
 local addonName, addonTable = ...
 -- Saved variables
 MyLatencyDB = {
