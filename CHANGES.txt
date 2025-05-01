@@ -1,2 +1,10 @@
-New layout desing - switch between Horizontal or verical view!
-Fixed Frame width and height if home latency or server latency is unchecked! No more gaps!
+Changes since tag MyLatency-2.5.1
+
+commit d8c4fc749c09a551162de23e061efe5ae074ee59
+Author: Broccoli <138363916+1broccoli@users.noreply.github.com>
+Date:   Wed Apr 9 01:05:02 2025 -0700
+
+    Update README.md
+    
+    sod patch update
+

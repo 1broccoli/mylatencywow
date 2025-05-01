@@ -3,7 +3,7 @@ local addonName, addonTable = ...
 -- Saved variables
 MyLatencyDB = {
     sliders = {50, 80, 50}, -- Updated default values for sliders
-    checkboxes = {true, true, true, false, false}, -- Updated for new checkboxes with defaults
+    checkboxes = {true, true, true, false, false, false}, -- Updated for new checkboxes with defaults
     position = {point = "CENTER", relativeTo = nil, relativePoint = "CENTER", xOfs = 0, yOfs = 0}, -- Default position
     frameSize = {width = 250, height = 100}, -- Adjusted default frame size
     updateLayout = false
@@ -14,7 +14,7 @@ local function InitializeSettings()
         MyLatencyDB = {}
     end
     MyLatencyDB.sliders = MyLatencyDB.sliders or {50, 80, 50}
-    MyLatencyDB.checkboxes = MyLatencyDB.checkboxes or {true, true, true, false, false}
+    MyLatencyDB.checkboxes = MyLatencyDB.checkboxes or {true, true, true, false, false, false}
     MyLatencyDB.position = MyLatencyDB.position or {point = "CENTER", relativeTo = nil, relativePoint = "CENTER", xOfs = 0, yOfs = 0}
     MyLatencyDB.frameSize = MyLatencyDB.frameSize or {width = 250, height = 100}
     
@@ -71,9 +71,19 @@ local serverLatencyValue = infoFrame:CreateFontString(nil, "OVERLAY", "GameFontN
 serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
 serverLatencyValue:SetTextColor(0, 1, 0) -- Initial color green
 
+-- FPS Text
+local fpsText = infoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+fpsText:SetText("|cFFFFFFFFFPS|r")
+fpsText:SetShown(false) -- Initially hidden
+
+-- Dynamic FPS value
+local fpsValue = infoFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+fpsValue:SetTextColor(0, 1, 0) -- Initial color green
+fpsValue:SetShown(false) -- Initially hidden
+
 -- Create the settings frame
 local settingsFrame = CreateFrame("Frame", "SettingsFrame", UIParent, "BackdropTemplate")
-settingsFrame:SetSize(200, 260)
+settingsFrame:SetSize(200, 280)
 settingsFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0) -- Centered initially
 settingsFrame:SetBackdrop({
     bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -104,7 +114,7 @@ settingsTitle:SetText("|cFF00FF00Settings|r") -- Green color
 local closeButton = CreateFrame("Button", nil, settingsFrame)
 closeButton:SetSize(24, 24)
 closeButton:SetPoint("TOPRIGHT", settingsFrame, "TOPRIGHT", -5, -5)
-closeButton:SetNormalTexture("Interface\\AddOns\\MyLatency\\close.png")
+closeButton:SetNormalTexture("Interface\\AddOns\\MyLatency\\Textures\\close.png")
 closeButton:SetScript("OnClick", function()
     settingsFrame:Hide()
 end)
@@ -173,7 +183,7 @@ local function CreateCheckbox(parent, label, yOffset, tooltip, onClick)
     return checkbox
 end
 
-local checkbox1, checkbox2, checkbox3
+local checkbox1, checkbox2, checkbox3, checkbox4
 
 -- Function to update the border color based on latency
 local function UpdateBorderColor(homeLatency, serverLatency)
@@ -198,53 +208,95 @@ local function UpdateFrameSize()
 
     if MyLatencyDB.updateLayout then
         -- Horizontal layout
-        width = 220
+        width = 290
         height = 35
-        localLatencyText:ClearAllPoints()
-        localLatencyText:SetPoint("LEFT", infoFrame, "LEFT", 10, 0)
-        localLatencyValue:ClearAllPoints()
-        localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
-        serverLatencyText:ClearAllPoints()
-        serverLatencyText:SetPoint("LEFT", localLatencyValue, "RIGHT", 15, 0)
-        serverLatencyValue:ClearAllPoints()
-        serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
-        
-        -- Adjust width if one of the latencies is hidden
+
+        if checkbox2 and checkbox2:GetChecked() then
+            localLatencyText:ClearAllPoints()
+            localLatencyText:SetPoint("LEFT", infoFrame, "LEFT", 10, 0)
+            localLatencyValue:ClearAllPoints()
+            localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
+        end
+
+        if checkbox3 and checkbox3:GetChecked() then
+            serverLatencyText:ClearAllPoints()
+            if checkbox2 and checkbox2:GetChecked() then
+                serverLatencyText:SetPoint("LEFT", localLatencyValue, "RIGHT", 15, 0)
+            else
+                serverLatencyText:SetPoint("LEFT", infoFrame, "LEFT", 10, 0)
+            end
+            serverLatencyValue:ClearAllPoints()
+            serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+        end
+
+        if checkbox4 and checkbox4:GetChecked() then
+            fpsText:ClearAllPoints()
+            if checkbox3 and checkbox3:GetChecked() then
+                fpsText:SetPoint("LEFT", serverLatencyValue, "RIGHT", 15, 0)
+            elseif checkbox2 and checkbox2:GetChecked() then
+                fpsText:SetPoint("LEFT", localLatencyValue, "RIGHT", 15, 0)
+            else
+                fpsText:SetPoint("LEFT", infoFrame, "LEFT", 10, 0)
+            end
+            fpsValue:ClearAllPoints()
+            fpsValue:SetPoint("LEFT", fpsText, "RIGHT", 5, 0)
+        end
+
+        -- Adjust width if elements are hidden
         if checkbox2 and not checkbox2:GetChecked() then
             width = width - 100
         end
         if checkbox3 and not checkbox3:GetChecked() then
             width = width - 95
-        elseif checkbox3 and checkbox3:GetChecked() and checkbox2 and not checkbox2:GetChecked() then
-            serverLatencyText:ClearAllPoints()
-            serverLatencyText:SetPoint("LEFT", infoFrame, "LEFT", 10, 0)
-            serverLatencyValue:ClearAllPoints()
-            serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+        end
+        if checkbox4 and not checkbox4:GetChecked() then
+            width = width - 75
         end
     else
         -- Vertical layout
         width = 120
-        height = 55
-        localLatencyText:ClearAllPoints()
-        localLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, -10)
-        localLatencyValue:ClearAllPoints()
-        localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
-        serverLatencyText:ClearAllPoints()
-        serverLatencyText:SetPoint("TOPLEFT", localLatencyText, "BOTTOMLEFT", 0, -10)
-        serverLatencyValue:ClearAllPoints()
-        serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
-        
-        -- Adjust height if one of the latencies is hidden
+        height = 80
+
+        if checkbox2 and checkbox2:GetChecked() then
+            localLatencyText:ClearAllPoints()
+            localLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, -10)
+            localLatencyValue:ClearAllPoints()
+            localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
+        end
+
+        if checkbox3 and checkbox3:GetChecked() then
+            serverLatencyText:ClearAllPoints()
+            if checkbox2 and checkbox2:GetChecked() then
+                serverLatencyText:SetPoint("TOPLEFT", localLatencyText, "BOTTOMLEFT", 0, -10)
+            else
+                serverLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, -10)
+            end
+            serverLatencyValue:ClearAllPoints()
+            serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+        end
+
+        if checkbox4 and checkbox4:GetChecked() then
+            fpsText:ClearAllPoints()
+            if checkbox3 and checkbox3:GetChecked() then
+                fpsText:SetPoint("TOPLEFT", serverLatencyText, "BOTTOMLEFT", 0, -10)
+            elseif checkbox2 and checkbox2:GetChecked() then
+                fpsText:SetPoint("TOPLEFT", localLatencyText, "BOTTOMLEFT", 0, -10)
+            else
+                fpsText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, -10)
+            end
+            fpsValue:ClearAllPoints()
+            fpsValue:SetPoint("LEFT", fpsText, "RIGHT", 5, 0)
+        end
+
+        -- Adjust height if elements are hidden
         if checkbox2 and not checkbox2:GetChecked() then
             height = height - 20
         end
         if checkbox3 and not checkbox3:GetChecked() then
             height = height - 20
-        elseif checkbox3 and checkbox3:GetChecked() and checkbox2 and not checkbox2:GetChecked() then
-            serverLatencyText:ClearAllPoints()
-            serverLatencyText:SetPoint("TOPLEFT", infoFrame, "TOPLEFT", 10, -10)
-            serverLatencyValue:ClearAllPoints()
-            serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+        end
+        if checkbox4 and not checkbox4:GetChecked() then
+            height = height - 20
         end
     end
 
@@ -262,6 +314,8 @@ local function UpdateLayout()
         localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0) 
         serverLatencyText:SetPoint("LEFT", localLatencyValue, "RIGHT", 20, 0) 
         serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0) 
+        fpsText:SetPoint("LEFT", serverLatencyValue, "RIGHT", 15, 0)
+        fpsValue:SetPoint("LEFT", fpsText, "RIGHT", 5, 0)
     else
         -- Vertical layout
         localLatencyText:ClearAllPoints()
@@ -269,10 +323,12 @@ local function UpdateLayout()
         localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
         serverLatencyText:SetPoint("TOPLEFT", localLatencyText, "BOTTOMLEFT", 0, -10)
         serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
-        end
-
-        UpdateFrameSize()
+        fpsText:SetPoint("TOPLEFT", serverLatencyText, "BOTTOMLEFT", 0, -10)
+        fpsValue:SetPoint("LEFT", fpsText, "RIGHT", 5, 0)
     end
+
+    UpdateFrameSize()
+end
 
 -- Function to apply settings
 local function ApplySettings()
@@ -358,6 +414,13 @@ end)
 checkbox3:SetID(3)
 checkbox3.Text:SetTextColor(0.5, 0.5, 0.5) -- Gray
 
+checkbox4 = CreateCheckbox(settingsFrame, "Show FPS", -220, "Toggle the display of FPS", function(checked)
+    fpsText:SetShown(checked)
+    fpsValue:SetShown(checked)
+    UpdateLayout()
+end)
+checkbox4:SetID(4)
+
 -- Create sliders
 local slider1 = CreateSlider(settingsFrame, "Scale", 25, 100, 50, -40, function(value)
     infoFrame:SetScale(value / 50) -- Scale from 0.5 to 2
@@ -382,10 +445,37 @@ local slider3 = CreateSlider(settingsFrame, "Text Alpha", 0, 100, 100, -120, fun
     localLatencyValue:SetAlpha(alpha)
     serverLatencyText:SetAlpha(alpha)
     serverLatencyValue:SetAlpha(alpha)
+    fpsText:SetAlpha(alpha)
+    fpsValue:SetAlpha(alpha)
 end)
 
 -- Call ApplySettings to apply the initial settings
 ApplySettings()
+
+-- Function to update the layout dynamically based on latency text width
+local function AdjustLatencyLayout()
+    local localLatencyWidth = localLatencyValue:GetStringWidth() or 0
+    local serverLatencyWidth = serverLatencyValue:GetStringWidth() or 0
+
+    -- Adjust positions dynamically to prevent overlap
+    localLatencyValue:ClearAllPoints()
+    localLatencyValue:SetPoint("LEFT", localLatencyText, "RIGHT", 5, 0)
+
+    serverLatencyText:ClearAllPoints()
+    if localLatencyWidth > 50 then -- Adjust if local latency is wide
+        serverLatencyText:SetPoint("TOPLEFT", localLatencyText, "BOTTOMLEFT", 0, -10)
+    else
+        serverLatencyText:SetPoint("TOPLEFT", 10, -30)
+    end
+
+    serverLatencyValue:ClearAllPoints()
+    serverLatencyValue:SetPoint("LEFT", serverLatencyText, "RIGHT", 5, 0)
+
+    -- Adjust frame width dynamically
+    local maxWidth = math.max(localLatencyText:GetStringWidth() + localLatencyWidth, serverLatencyText:GetStringWidth() + serverLatencyWidth) + 20
+    local currentHeight = infoFrame:GetHeight()
+    infoFrame:SetSize(math.max(maxWidth, 120), currentHeight)
+end
 
 -- Update function
 local function UpdateStats()
@@ -432,6 +522,24 @@ local function UpdateStats()
     else
         infoFrame:SetBackdropBorderColor(0, 0, 0, 0) -- Clear border
     end
+
+    -- Update FPS
+    if checkbox4 and checkbox4:GetChecked() then
+        local fps = math.floor(GetFramerate() + 0.5) -- Round to nearest whole number
+        fpsValue:SetText(fps)
+
+        -- Set FPS color based on value
+        if fps <= 30 then
+            fpsValue:SetTextColor(1, 0, 0) -- Red
+        elseif fps < 60 then
+            fpsValue:SetTextColor(1, 1, 0) -- Yellow
+        else
+            fpsValue:SetTextColor(0, 1, 0) -- Green
+        end
+    end
+
+    -- Adjust layout dynamically to prevent overlap
+    AdjustLatencyLayout()
 
     UpdateFrameSize() -- Update frame size based on new content
 end
@@ -546,16 +654,20 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
             checkbox1:SetChecked(MyLatencyDB.checkboxes[1])
             checkbox2:SetChecked(MyLatencyDB.checkboxes[2])
             checkbox3:SetChecked(MyLatencyDB.checkboxes[3])
+            checkbox4:SetChecked(MyLatencyDB.checkboxes[4])
             -- Apply checkbox states
             checkbox1:GetScript("OnClick")(checkbox1)
             checkbox2:GetScript("OnClick")(checkbox2)
             checkbox3:GetScript("OnClick")(checkbox3)
+            checkbox4:GetScript("OnClick")(checkbox4)
             -- Apply text alpha
             local alpha = MyLatencyDB.sliders[3] / 100
             localLatencyText:SetAlpha(alpha)
             localLatencyValue:SetAlpha(alpha)
             serverLatencyText:SetAlpha(alpha)
             serverLatencyValue:SetAlpha(alpha)
+            fpsText:SetAlpha(alpha)
+            fpsValue:SetAlpha(alpha)
             -- Apply frame size
             UpdateLayout()
         end
@@ -567,6 +679,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
         MyLatencyDB.checkboxes[1] = checkbox1:GetChecked()
         MyLatencyDB.checkboxes[2] = checkbox2:GetChecked()
         MyLatencyDB.checkboxes[3] = checkbox3:GetChecked()
+        MyLatencyDB.checkboxes[4] = checkbox4:GetChecked()
         MyLatencyDB.updateLayout = not not MyLatencyDB.updateLayout -- Save button state
 
         -- Save frame position

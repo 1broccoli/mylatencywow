@@ -2,8 +2,9 @@
 ## Title: My|cff1eff00Latency|r
 ## Notes: Show |cff1eff00Latency|r in ms for server and local
 ## Author: |cffe6cc80Pegga|r 
-## Version: 2.5.1
+## Version: 2.6.0
 ## SavedVariables: MyLatencyDB
-## Website https://github.com/1broc2coli?tab=repositories
+## Website: https://github.com/1broccoli/mylatencywow
+## IconTexture: Interface\AddOns\MyLatency\Textures\icon.blp
 
 MyLatency.lua
