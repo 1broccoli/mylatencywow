@@ -670,6 +670,8 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
             fpsValue:SetAlpha(alpha)
             -- Apply frame size
             UpdateLayout()
+            -- Restore frame position
+            infoFrame:SetPoint(MyLatencyDB.position.point, MyLatencyDB.position.relativeTo, MyLatencyDB.position.relativePoint, MyLatencyDB.position.xOfs, MyLatencyDB.position.yOfs)
         end
     elseif event == "PLAYER_LOGOUT" then
         -- Save current settings
