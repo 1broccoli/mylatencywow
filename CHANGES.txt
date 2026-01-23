@@ -1,0 +1,34 @@
+Version 3.1.0 - January 23, 2026
+- Added minimap launcher (left-click to lock/unlock, right-click to open settings) with a hide toggle saved per profile
+- Integrated LibSharedMedia-3.0 selectors for font, background, and border; display backdrop now uses the chosen media
+- Consolidated options into a single inline page with tooltip-style backdrop and embedded Profiles tab
+- Increased line spacing slider range up to 100 and ensured layout resizes correctly at large spacing values
+
+Version 3.0.0 - January 23, 2026
+- MAJOR REFACTOR: Rebuilt addon using Ace3 libraries for cleaner architecture
+- Integrated AceDB-3.0 for profile-based SavedVariables management
+- Integrated AceConfig-3.0 + AceConfigDialog-3.0 for auto-generated options UI
+- Integrated AceTimer-3.0 for repeating stat updates (1-second timer)
+- Integrated AceConsole-3.0 for slash commands (/mlat, /mylatency)
+- Removed manual settings frame; now uses professional Blizzard options panel
+- Fixed all frame alignment and sizing issues that plagued previous versions
+- Line Spacing now works correctly in both horizontal and vertical layouts
+- Cleaner codebase: reduced from 1300 lines to 408 lines with better separation of concerns
+- Improved frame sizing calculation to eliminate dead space
+- All visual settings (scale, alpha, spacing) now update dynamically
+- Chat commands: /mlat or /mylatency to open settings
+
+Version 2.10.0 - January 23, 2026
+- Added "Lock Frame" toggle to prevent accidental dragging of the display
+- Added "Text Outline" option to draw outlines around latency and FPS text
+- Added "Line Spacing" slider to adjust vertical spacing between lines in vertical layout
+- Fixed frame offset issues when changing line spacing values
+- Improved vertical layout anchoring to keep content centered regardless of spacing setting
+- Frame now properly resizes in vertical layout based on actual text widths and spacing
+
+Version 2.9.3 - January 18, 2026
+- Fixed reputation bar disappearing when unchecking experience bar in config
+- Experience bar and reputation bar now have independent enable/disable controls
+- Frame initialization improved to allow reputation bar creation when experience bar is disabled
+- Prevented accidental hiding of default reputation bar when only experience bar is disabled
+
